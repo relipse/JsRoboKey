@@ -6,10 +6,12 @@ Think of desktop scripting using javascript.
 Example Script
 ---------------
 A simple script might look like this:
+```
     //run notepad, wait a little bit for it to open, then send some keystrokes
     rk.run('notepad');
     rk.sleep(700);
     rk.sendKeys('abcdefgABCDEFG1234567890!@#$%^&*()');
+```
 
 Need Helpers
 ------------
