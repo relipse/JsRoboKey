@@ -16,8 +16,8 @@ A simple script might look like this:
 Need Helpers
 ------------
 In order to make this a reality, I am going to need some passionate helpers to get this working, we need most all of the feature which AutoHotKey has, and cross-platform.
-The features are so many so just start coding, shoot me an email at relipse@gmail.com and start by forking the repo. Make a few changes, fix a few bus or add a few features!
-
+The features are so many so just start coding, shoot me an email at relipse@gmail.com and start by forking the repo. Make a few changes, fix a few bugs or add a few features!
+Then submit a pull request!
 
 Goal
 ----
