@@ -42,6 +42,8 @@ class RKNetReply : public QNetworkReply {
        }
 };
 
+
+
 class DlgJsRoboKey : public QDialog
 {
     Q_OBJECT
@@ -81,12 +83,13 @@ public slots:
     void sendVKey(WORD vk);
 
     int build();
-    const QString& version();
+    QString version();
 
     void sleep(int ms);
     bool exit();
 
     QString help();
+    QString getMethods();
     //--------------------------------------------
     //yeah don't tell anyone you can call this
     void fileDownloaded(QNetworkReply *pReply);
@@ -110,5 +113,7 @@ private:
 
     QNetworkAccessManager m_webCtrl;
 };
+
+
 
 #endif // DLGJSROBOKEY_H

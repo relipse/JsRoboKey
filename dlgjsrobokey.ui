@@ -39,7 +39,7 @@
     <string>Unload All</string>
    </property>
   </widget>
-  <widget class="QPlainTextEdit" name="memoInstaScript">
+  <widget class="JSEdit" name="memoInstaScript">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -85,6 +85,13 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>JSEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>jsedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

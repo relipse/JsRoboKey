@@ -24,9 +24,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        dlgjsrobokey.cpp
+        dlgjsrobokey.cpp\
+        jsedit.cpp
 
 HEADERS  += dlgjsrobokey.h
+
+HEADERS += jsedit.h
 
 FORMS    += dlgjsrobokey.ui
 

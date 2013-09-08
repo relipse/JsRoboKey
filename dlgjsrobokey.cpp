@@ -17,19 +17,47 @@ DlgJsRoboKey::DlgJsRoboKey(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    JSEdit& editor = *ui->memoInstaScript;
+    editor.setWindowTitle("Insta Run");
+    editor.setFrameShape(JSEdit::NoFrame);
+    editor.setWordWrapMode(QTextOption::NoWrap);
+    editor.setTabStopWidth(4);
+    //editor.resize(QApplication::desktop()->availableGeometry().size() / 2);
+    QStringList keywords = editor.keywords();
+    keywords << "const";
+    keywords << "let";
+    editor.setKeywords(keywords);
+
+    // dark color scheme
+    editor.setColor(JSEdit::Background,    QColor("#0C152B"));
+    editor.setColor(JSEdit::Normal,        QColor("#FFFFFF"));
+    editor.setColor(JSEdit::Comment,       QColor("#666666"));
+    editor.setColor(JSEdit::Number,        QColor("#DBF76C"));
+    editor.setColor(JSEdit::String,        QColor("#5ED363"));
+    editor.setColor(JSEdit::Operator,      QColor("#FF7729"));
+    editor.setColor(JSEdit::Identifier,    QColor("#FFFFFF"));
+    editor.setColor(JSEdit::Keyword,       QColor("#FDE15D"));
+    editor.setColor(JSEdit::BuiltIn,       QColor("#9CB6D4"));
+    editor.setColor(JSEdit::Cursor,        QColor("#1E346B"));
+    editor.setColor(JSEdit::Marker,        QColor("#DBF76C"));
+    editor.setColor(JSEdit::BracketMatch,  QColor("#1AB0A6"));
+    editor.setColor(JSEdit::BracketError,  QColor("#A82224"));
+    editor.setColor(JSEdit::FoldIndicator, QColor("#555555"));
+
     initialize();
-    m_version = tr("0.13.0806.0832");
+    m_version = QDate::fromString(__DATE__, "MMM dd yyyy").toString("yyyy-MM-dd");
 }
 
 DlgJsRoboKey::~DlgJsRoboKey()
 { 
+    /*
     //remove all hotkeys
     for (int i = 0; i < m_globalHotkeys.size(); ++i){
         m_globalHotkeys[i].first->setEnabled(false);
         delete m_globalHotkeys[i].first;
         m_globalHotkeys[i].first = NULL;
     }
-    delete ui;
+    delete ui;*/
 }
 
 /**
@@ -375,7 +403,7 @@ int DlgJsRoboKey::build()
 }
 
 
-const QString &DlgJsRoboKey::version()
+QString DlgJsRoboKey::version()
 {
     return m_version;
 }
@@ -388,24 +416,28 @@ bool DlgJsRoboKey::exit()
 
 QString DlgJsRoboKey::help()
 {
-    return " const QString clipboard();"
-            "bool fileExists(const QString& file);"
-            "bool requireOnce(const QString& file);"
-            "bool include(const QString& file);"
-            "bool addGlobalHotKey(const QString& hotkey, const QJSValue& callback);"
-            "bool downloadURL(const QString& url, const QJSValue &callback);"
-            "void helloWorld();"
-            "QByteArray downloadedData() const;"
-            "QString getIncludedFiles();"
+    return "Available Methods:\n"
+            + getMethods();
+}
 
-            "void alert(const QString &text, const QString &title = '');"
-
-            "void sendKeys(const QString& keys);"
-
-            "int build();"
-            "QString& version();"
-
-            "bool exit();";
+/**
+ * @brief DlgJsRoboKey::getMethods
+ * Get a string showing all of the methods available to connect
+ * @return
+ */
+QString DlgJsRoboKey::getMethods()
+{
+    QString s = "";
+    //DlgJsRoboKey *obj = static_cast<DlgJsRoboKey*>(DlgJsRoboKey::staticMetaObject.newInstance());
+    for (int i = 0; i < this->metaObject()->methodCount(); i++)
+    {
+        QMetaMethod method = this->metaObject()->method(i);
+        if (method.methodType() == QMetaMethod::Slot && method.access() == QMetaMethod::Public){
+            if (s != ""){ s += "\n"; }
+            s += method.methodSignature();
+        }
+    }
+    return s;
 }
 
 
