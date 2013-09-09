@@ -109,4 +109,13 @@ void DlgJsRoboKey::on_btnInstaRun_clicked()
 }
 
 
+QJSEngine *DlgJsRoboKey::jsengine()
+{
+   return &m_jsengine;
+}
+
+
+
+
+
 

@@ -17,6 +17,8 @@
 #include <QUrl>
 #include "dlgjsrobokey.h"
 
+#include "jscallback.h"
+
 class DlgJsRoboKey;
 
 #ifdef WIN32
@@ -29,21 +31,6 @@ BOOL SendText( LPCTSTR lpctszText );
 
 //The below few classes are helper classes
 typedef QPair<QxtGlobalShortcut*, QJSValue> QxtGlbShortcutJSVal;
-
-
-//void setAttribute(QNetworkRequest::Attribute code, const QVariant &value);
-class RKNetReply : public QNetworkReply {
-     public:
-       void setPointer(void* ptr){
-           this->setAttribute(QNetworkRequest::User, QVariant((int)ptr));
-       }
-
-       void* getPointer(){
-           return (void*)this->attribute(QNetworkRequest::User).toInt();
-       }
-};
-
-
 
 
 //---------------------------------------------------------------------
@@ -64,7 +51,7 @@ public slots:
         bool require(const QString& file);
         bool include(const QString& file);
         bool addGlobalHotKey(const QString& hotkey, const QJSValue& callback);
-        bool download(const QString& url, const QJSValue &callback);
+        bool download(const QString& url, const QJSValue &callback_complete);
         void helloWorld(){ qDebug() << "hello World"; alert("Hello world"); }
         void openUrl(const QString& url);
         bool run(const QString& file, const QString &a1="", const QString &a2="", const QString &a3="", const QString &a4="", const QString &a5="", const QString &a6="");
@@ -92,6 +79,12 @@ private:
         QStringList m_included_files;
         QList<QxtGlbShortcutJSVal> m_globalHotkeys;
         QNetworkAccessManager m_webCtrl;
+
+        /**
+         * @brief a list of callbacks that need to be deleted sometime, either after they get
+         *  called if they are temporary or after JsRoboKey exits
+         */
+        QList<JSCallback*> m_callbacks;
 };
 
 #endif // JSROBOKEY_H

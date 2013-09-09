@@ -36,7 +36,7 @@ void JsRoboKey::sleep(int ms)
 {
     QTime dieTime= QTime::currentTime().addMSecs(ms);
     while( QTime::currentTime() < dieTime ){
-       QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
     }
 }
 
@@ -53,7 +53,7 @@ bool JsRoboKey::exit()
 
 QString JsRoboKey::compilationDate()
 {
-   return QDate::fromString(__DATE__, "MMM dd yyyy").toString("yyyy-MM-dd");
+    return QDate::fromString(__DATE__, "MMM dd yyyy").toString("yyyy-MM-dd");
 }
 
 QString JsRoboKey::help()
@@ -122,21 +122,14 @@ bool JsRoboKey::addGlobalHotKey(const QString &hotkey, const QJSValue &callback)
     shortcut->setEnabled(true);
 }
 
+#include "jsrdownload.h"
 
-bool JsRoboKey::download(const QString &url, const QJSValue &callback)
+bool JsRoboKey::download(const QString &url, const QJSValue &callback_complete)
 {
-    if (!callback.isCallable()){
-         return false;
-    }
-    qDebug() << "downloading " << url << " callback: " << callback.toString();
-    connect(&m_webCtrl, SIGNAL(finished(QNetworkReply*)),
-            SLOT(fileDownloaded(QNetworkReply*)));
-    QUrl u(url);
-    QNetworkRequest request(u);
-    RKNetReply* reply = (RKNetReply*)m_webCtrl.get(request);
-    QJSValue* nwCallback = new QJSValue(callback);
-    reply->setPointer((void*)nwCallback);
-    return true;
+    JSCallback* jscb = new JSRDownload(app()->jsengine(), callback_complete, url);
+    m_callbacks.push_back(jscb);
+    //start the download, the callback will happen
+    jscb->exec();
 }
 
 void JsRoboKey::openUrl(const QString &url)
@@ -192,31 +185,7 @@ QString JsRoboKey::runWait(const QString &file, const QString &a1)
 
 void JsRoboKey::fileDownloaded(QNetworkReply* pReply)
 {
-    QByteArray downloadedData = pReply->readAll();
-    QString data(downloadedData);
 
-    //QVariant vcallback = pReply->attribute(QNetworkRequest::User);
-
-    QJSValue* cb = (QJSValue*)(void*)pReply->attribute(QNetworkRequest::User).toInt();
-
-    qDebug() << cb->toString(); //<< "Downloaded file data: " << data;
-
-    if (cb->isCallable()){
-        QJSValueList args;
-        args.push_back(QJSValue(data));
-       cb->call(args);
-    }
-
-
-    //emit a signal
-    pReply->deleteLater();
-
-    delete pReply;
-    //emit downloaded();
-
-    //finally we delete it after the download came through
-    //TODO: if the download never comes through we are screwed!
-    delete cb;
 }
 
 
@@ -264,7 +233,7 @@ void JsRoboKey::sendVKey(WORD vk){
 bool JsRoboKey::sendKeys(const QString &keys)
 {
     //TODO: make this cross platform
-    #ifdef WIN32
+#ifdef WIN32
     wchar_t myArray[keys.size()+1];
     int x;
     for (x=0; x < keys.size(); x++)
@@ -275,7 +244,7 @@ bool JsRoboKey::sendKeys(const QString &keys)
 
     LPCTSTR str = myArray;
     return SendText(str);
-    #endif
+#endif
 
     return false;
 }
@@ -284,7 +253,7 @@ bool JsRoboKey::sendKeys(const QString &keys)
 #include <string.h>
 #include <tchar.h>
 BOOL SendText( LPCTSTR lpctszText )
-    {
+{
     std::vector<INPUT> EventQueue;
 
     TCHAR Buff[120 * sizeof(TCHAR)] = {0};
@@ -293,21 +262,21 @@ BOOL SendText( LPCTSTR lpctszText )
 
     const size_t Len = wcslen( lpctszText );
     for( size_t Index = 0; Index < Len; ++Index )
-        {
+    {
         INPUT Event = { 0 };
 
         const SHORT Vk = VkKeyScanEx(lpctszText[Index], hKeyboardLayout);
         const UINT VKey = ::MapVirtualKey( LOBYTE( Vk ), 0 );
 
         if( HIBYTE( Vk ) == 1 ) // Check if shift key needs to be pressed for this key
-            {
+        {
             // Press shift key
             ::ZeroMemory( &Event, sizeof( Event ));
             Event.type = INPUT_KEYBOARD;
             Event.ki.dwFlags = KEYEVENTF_SCANCODE;
             Event.ki.wScan = ::MapVirtualKey( VK_LSHIFT, 0 );
             EventQueue.push_back( Event );
-            }
+        }
 
         // Keydown
         ::ZeroMemory( &Event, sizeof( Event ));
@@ -324,20 +293,20 @@ BOOL SendText( LPCTSTR lpctszText )
         EventQueue.push_back( Event );
 
         if( HIBYTE( Vk ) == 1 )// Release if previously pressed
-            {
+        {
             // Release shift key
             ::ZeroMemory( &Event, sizeof( Event ));
             Event.type = INPUT_KEYBOARD;
             Event.ki.dwFlags = KEYEVENTF_SCANCODE| KEYEVENTF_KEYUP;
             Event.ki.wScan = ::MapVirtualKey( VK_LSHIFT, 0 );
             EventQueue.push_back( Event );
-            }
-        }// End for
+        }
+    }// End for
 
     if( hKeyboardLayout )
-        {
+    {
         UnloadKeyboardLayout( hKeyboardLayout );
-        }
+    }
 
     return static_cast<BOOL>(::SendInput( static_cast<UINT>(EventQueue.size()), &EventQueue[0], sizeof( INPUT )));
 }

@@ -26,10 +26,14 @@ TEMPLATE = app
 SOURCES += main.cpp\
         dlgjsrobokey.cpp\
         jsedit.cpp \
-    jsrobokey.cpp
+    jsrobokey.cpp \
+    jscallback.cpp \
+    jsrdownload.cpp
 
 HEADERS  += dlgjsrobokey.h \
-    jsrobokey.h
+    jsrobokey.h \
+    jscallback.h \
+    jsrdownload.h
 
 HEADERS += jsedit.h
 

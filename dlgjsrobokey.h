@@ -35,6 +35,8 @@ public:
     void initialize();
     bool loadJSFile(const QString& file);
     bool loadJS(const QString& code, const QString &module_or_filename);
+    QJSEngine* jsengine();
+
 private slots:
     void on_btnInstaRun_clicked();
 
