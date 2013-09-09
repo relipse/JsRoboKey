@@ -12,6 +12,7 @@
  *  to make good use of it.
  */
 class JSCallback : public QObject {
+    Q_OBJECT
 public:
     JSCallback() : m_pengine(NULL), m_callback(0), m_callbackResult(0) {}
     //override this function to initiate some events that will later call the callback
