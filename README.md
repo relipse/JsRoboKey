@@ -3,7 +3,7 @@ Welcome
 Welcome, JsRoboKey was inspired by AutoHotKey, Qt, Cross-platform coding, and javascript (thanks nodejs for making javascript real)
 Think of desktop scripting using javascript.
 
-Example Script
+Example Scripts
 ---------------
 A simple script might look like this:
 ```
@@ -12,6 +12,13 @@ A simple script might look like this:
     rk.sleep(700);
     rk.sendKeys('abcdefgABCDEFG1234567890!@#$%^&*()');
 ```
+Or even better, trigger to run notepad after a certain hotkey!
+```
+rk.addGlobalHotkey('Meta+Alt+N', function(){
+   rk.run('notepad');
+});
+```
+(Meta) means the Windows key
 
 Need Helpers
 ------------
