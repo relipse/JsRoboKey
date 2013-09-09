@@ -40,4 +40,4 @@ HEADERS += jsedit.h
 FORMS    += dlgjsrobokey.ui
 
 
-VERSION = 0.13.0805
+VERSION = 130805

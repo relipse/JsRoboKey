@@ -8,6 +8,7 @@
 #include <QNetworkAccessManager>
 
 class JSRDownload : public JSCallback {
+    Q_OBJECT
 private:
     QString m_url;
     QNetworkAccessManager m_webCtrl;

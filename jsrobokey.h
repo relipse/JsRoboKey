@@ -73,8 +73,6 @@ public slots:
         QString help();
         QString getMethods();
         //--------------------------------------------
-        //yeah don't tell anyone you can call this
-        void fileDownloaded(QNetworkReply *pReply);
 private:
         QStringList m_included_files;
         QList<QxtGlbShortcutJSVal> m_globalHotkeys;

@@ -183,10 +183,6 @@ QString JsRoboKey::runWait(const QString &file, const QString &a1)
 }
 
 
-void JsRoboKey::fileDownloaded(QNetworkReply* pReply)
-{
-
-}
 
 
 QString JsRoboKey::getIncludedFiles()
