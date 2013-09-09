@@ -14,7 +14,7 @@
 class JSCallback : public QObject {
     Q_OBJECT
 public:
-    JSCallback() : m_pengine(NULL), m_callback(0), m_callbackResult(0) {}
+    JSCallback(QJSEngine* pengine = NULL, QJSValue callback = 0) : m_pengine(pengine), m_callback(callback), m_callbackResult(0) {}
     //override this function to initiate some events that will later call the callback
     virtual bool exec() = 0;
     QJSEngine *pengine() const;

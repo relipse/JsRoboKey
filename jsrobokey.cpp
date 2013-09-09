@@ -1,5 +1,7 @@
 #include "jsrobokey.h"
 
+#include "jsrdownload.h"
+
 #include <QApplication>
 #include <QTime>
 #include <QClipboard>
@@ -107,29 +109,21 @@ bool JsRoboKey::include(const QString &file)
     return app()->loadJSFile(file);
 }
 
-bool JsRoboKey::addGlobalHotKey(const QString &hotkey, const QJSValue &callback)
+bool JsRoboKey::addGlobalHotkey(const QString &hotkey, const QJSValue &callback)
 {
-    //TODO: make callback work
-    //TODO: check if we have an existing hotkey
-    if (!callback.isCallable()){
-        return false;
-    }
-    QxtGlobalShortcut* shortcut = new QxtGlobalShortcut();
-    m_globalHotkeys.push_back(qMakePair(shortcut, callback));
-    shortcut->setShortcut(QKeySequence(hotkey));
-    //TODO: actually call javascript engine callback instead of helloWorld
-    connect(shortcut, SIGNAL(activated()), this, SLOT(helloWorld()));
-    shortcut->setEnabled(true);
+    JSCallback* pcallback = new JSRGlobalHotkey(app()->jsengine(), callback, hotkey);
+    m_callbacks.push_back(pcallback);
+    return pcallback->exec();
 }
 
-#include "jsrdownload.h"
+
 
 bool JsRoboKey::download(const QString &url, const QJSValue &callback_complete)
 {
     JSCallback* jscb = new JSRDownload(app()->jsengine(), callback_complete, url);
     m_callbacks.push_back(jscb);
     //start the download, the callback will happen
-    jscb->exec();
+    return jscb->exec();
 }
 
 void JsRoboKey::openUrl(const QString &url)

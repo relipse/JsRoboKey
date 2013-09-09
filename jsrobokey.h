@@ -18,6 +18,7 @@
 #include "dlgjsrobokey.h"
 
 #include "jscallback.h"
+#include "jsrglobalhotkey.h"
 
 class DlgJsRoboKey;
 
@@ -50,9 +51,8 @@ public slots:
         bool fileExists(const QString& file);
         bool require(const QString& file);
         bool include(const QString& file);
-        bool addGlobalHotKey(const QString& hotkey, const QJSValue& callback);
+        bool addGlobalHotkey(const QString& hotkey, const QJSValue& callback);
         bool download(const QString& url, const QJSValue &callback_complete);
-        void helloWorld(){ qDebug() << "hello World"; alert("Hello world"); }
         void openUrl(const QString& url);
         bool run(const QString& file, const QString &a1="", const QString &a2="", const QString &a3="", const QString &a4="", const QString &a5="", const QString &a6="");
         QString runWait(const QString& file, const QString& a1="");
@@ -72,6 +72,10 @@ public slots:
         QString compilationDate();
         QString help();
         QString getMethods();
+
+
+        //---what-the-hey-we-gotta-have-one-of-these
+        void helloWorld(){ qDebug() << "hello World"; alert("Hello world"); }
         //--------------------------------------------
 private:
         QStringList m_included_files;

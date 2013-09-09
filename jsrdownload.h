@@ -16,11 +16,8 @@ private:
     QNetworkReply* m_reply;
 public:
     JSRDownload(QJSEngine* pengine, QJSValue callback, const QString& url)
-        : m_url(url)
-    {
-       m_pengine = pengine;
-       m_callback = callback;
-    }
+        : JSCallback(pengine, callback), m_url(url)
+    { }
 
     bool exec();
 public slots:
