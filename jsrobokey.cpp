@@ -1,5 +1,6 @@
 #include "jsrobokey.h"
 
+#include "jscallback.h"
 #include "jsrdownload.h"
 
 #include <QApplication>
@@ -18,11 +19,8 @@ JsRoboKey::JsRoboKey(QObject *parent) :
 
 JsRoboKey::~JsRoboKey()
 {
-    //remove all hotkeys
-    for (int i = 0; i < m_globalHotkeys.size(); ++i){
-        m_globalHotkeys[i].first->setEnabled(false);
-        delete m_globalHotkeys[i].first;
-        m_globalHotkeys[i].first = NULL;
+    for (int i = 0; i < m_callbacks.size(); ++i){
+        delete m_callbacks[i];
     }
 }
 
@@ -198,6 +196,45 @@ void JsRoboKey::alert(const QString &text, const QString& title)
         t = "JsRoboKey Alert";
     }
     QMessageBox::information(app(), t, text);
+}
+
+#include "jsrsingleshot.h"
+
+int JsRoboKey::setTimeout(const QJSValue &callback, int ms)
+{
+    static int timerId = 1;
+    JSRSingleShot* jscb = new JSRSingleShot(app()->jsengine(), callback, ms);
+    m_timers[timerId++] = jscb;
+    m_callbacks.push_back((JSCallback*)jscb);
+    //start the timeout
+    jscb->exec();
+    return timerId-1;
+}
+
+int JsRoboKey::timeoutRemainingTime(int timeoutId){
+
+    if (m_timers.contains(timeoutId)){
+        return m_timers[timeoutId]->remainingTime();
+    }
+    return -3;
+}
+
+void JsRoboKey::clearTimeout(int timeoutId){
+    JSCallback* pcb = NULL;
+
+    if (m_timers.contains(timeoutId)){
+        pcb = m_timers[timeoutId];
+        m_timers[timeoutId]->cancel();
+        m_timers[timeoutId]->deleteLater();
+    }
+
+    if (pcb){
+        for (int i = 0; i < m_callbacks.size(); ++i){
+            if (m_callbacks[i] == pcb){
+                m_callbacks[i] = NULL;
+            }
+        }
+    }
 }
 
 

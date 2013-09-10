@@ -19,6 +19,7 @@
 
 #include "jscallback.h"
 #include "jsrglobalhotkey.h"
+#include "jsrsingleshot.h"
 
 class DlgJsRoboKey;
 
@@ -29,9 +30,6 @@ class DlgJsRoboKey;
 #ifdef WIN32
 BOOL SendText( LPCTSTR lpctszText );
 #endif
-
-//The below few classes are helper classes
-typedef QPair<QxtGlobalShortcut*, QJSValue> QxtGlbShortcutJSVal;
 
 
 //---------------------------------------------------------------------
@@ -44,6 +42,8 @@ public:
     explicit JsRoboKey(QObject *parent = 0);
     ~JsRoboKey();
     DlgJsRoboKey* app(){ return (DlgJsRoboKey*)parent(); }
+
+
 signals:
     
 public slots:
@@ -59,6 +59,9 @@ public slots:
         QString getIncludedFiles();
 
         void alert(const QString &text, const QString &title = "");
+        int setTimeout(const QJSValue& callback, int ms);
+        int timeoutRemainingTime(int timeoutId);
+        void clearTimeout(int timeoutId);
 
         bool sendKeys(const QString& keys);
         void sendVKey(WORD vk);
@@ -78,15 +81,16 @@ public slots:
         void helloWorld(){ qDebug() << "hello World"; alert("Hello world"); }
         //--------------------------------------------
 private:
-        QStringList m_included_files;
-        QList<QxtGlbShortcutJSVal> m_globalHotkeys;
-        QNetworkAccessManager m_webCtrl;
 
+        QStringList m_included_files;
         /**
          * @brief a list of callbacks that need to be deleted sometime, either after they get
          *  called if they are temporary or after JsRoboKey exits
          */
         QList<JSCallback*> m_callbacks;
+
+
+        QMap<int, JSRSingleShot*> m_timers;
 };
 
 #endif // JSROBOKEY_H

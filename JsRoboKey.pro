@@ -29,13 +29,15 @@ SOURCES += main.cpp\
     jsrobokey.cpp \
     jscallback.cpp \
     jsrdownload.cpp \
-    jsrglobalhotkey.cpp
+    jsrglobalhotkey.cpp \
+    jsrsingleshot.cpp
 
 HEADERS  += dlgjsrobokey.h \
     jsrobokey.h \
     jscallback.h \
     jsrdownload.h \
-    jsrglobalhotkey.h
+    jsrglobalhotkey.h \
+    jsrsingleshot.h
 
 HEADERS += jsedit.h
 
