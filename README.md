@@ -49,7 +49,7 @@ winWait('notepad', function(match){
 });
 ```
 
-A new feature onClipboardChange() check it out!!!
+A new feature onClipboardChange() which sets up a callback when the clipboard changes, think of the possibilities!
 ```
 rk.onClipboardChange(function(data){
     if (typeof(data) != 'string'){ return; }
