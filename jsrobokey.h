@@ -45,6 +45,7 @@ public:
 
 
 
+
 signals:
     
 public slots:
@@ -81,8 +82,10 @@ public slots:
         QString getMethods();
 
         //more windows api stuff
+        int findWindow(const QString &strClass, const QString &strWindowName);
         int getForegroundWindow();
         QString getWindowText(int hwnd);
+        bool closeWindow(int hwnd);
 
         //---what-the-hey-we-gotta-have-one-of-these
         void helloWorld(){ qDebug() << "hello World"; alert("Hello world"); }

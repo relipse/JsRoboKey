@@ -101,6 +101,22 @@ QString JsRoboKey::getWindowText(int hwnd)
     return s;
 }
 
+int JsRoboKey::findWindow(const QString& strClass, const QString& strWindowName)
+{
+#ifdef WIN32
+    ///return (int)FindWindow(strClass.toWCharArray(), strWindowName.toWCharArray());
+#endif
+    return 0;
+}
+
+bool JsRoboKey::closeWindow(int hwnd)
+{
+#ifdef WIN32
+    return CloseWindow((HWND)hwnd);
+#endif
+    return false;
+}
+
 bool JsRoboKey::fileExists(const QString &file)
 {
     QFile f(file);
