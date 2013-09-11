@@ -49,6 +49,15 @@ winWait('notepad', function(match){
 });
 ```
 
+A new feature onClipboardChange() check it out!!!
+```
+rk.onClipboardChange(function(data){
+    if (typeof(data) != 'string'){ return; }
+    if (data.indexOf('foobar') >= 0){
+       rk.alert('foobar on clipboard: ' + data);
+    }
+});
+```
 
 Need Helpers
 ------------
