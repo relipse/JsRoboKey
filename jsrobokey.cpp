@@ -2,6 +2,7 @@
 
 #include "jscallback.h"
 #include "jsrdownload.h"
+#include "jsrclipboardchange.h"
 
 #include <QApplication>
 #include <QTime>
@@ -145,6 +146,13 @@ bool JsRoboKey::include(const QString &file)
 bool JsRoboKey::addGlobalHotkey(const QString &hotkey, const QJSValue &callback)
 {
     JSCallback* pcallback = new JSRGlobalHotkey(app()->jsengine(), callback, hotkey);
+    m_callbacks.push_back(pcallback);
+    return pcallback->exec();
+}
+
+bool JsRoboKey::onClipboardChange(const QJSValue &callback)
+{
+    JSCallback* pcallback = new JSRClipboardChange(app()->jsengine(), callback);
     m_callbacks.push_back(pcallback);
     return pcallback->exec();
 }

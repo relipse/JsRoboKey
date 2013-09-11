@@ -50,10 +50,14 @@ signals:
     
 public slots:
         const QString clipboard();
+
         bool fileExists(const QString& file);
         bool require(const QString& file);
         bool include(const QString& file);
+
         bool addGlobalHotkey(const QString& hotkey, const QJSValue& callback);
+        bool onClipboardChange(const QJSValue& callback);
+
         bool download(const QString& url, const QJSValue &callback_complete);
         void openUrl(const QString& url);
         void openFile(const QString& file);
