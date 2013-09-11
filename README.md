@@ -6,14 +6,14 @@ Think of desktop scripting using javascript.
 Example Scripts
 ---------------
 A simple script might look like this:
-```
+```js
     //run notepad, wait a little bit for it to open, then send some keystrokes
     rk.run('notepad');
     rk.sleep(700);
     rk.sendKeys('abcdefgABCDEFG1234567890!@#$%^&*()');
 ```
 Or even better, trigger to run notepad after a certain hotkey!
-```
+```js
 rk.addGlobalHotkey('Meta+Alt+N', function(){
    rk.run('notepad');
 });
@@ -21,7 +21,7 @@ rk.addGlobalHotkey('Meta+Alt+N', function(){
 (Meta) means the Windows key
 
 And demonstrating some new functionality, this script will run notepad and wait for it to open
-```
+```js
 function fgWinMatches(winTitle){
     var hwnd = rk.getForegroundWindow();
     var title = rk.getWindowText(hwnd);
@@ -48,9 +48,9 @@ winWait('notepad', function(match){
     rk.sendKeys('Hello World');
 });
 ```
-
+###### onClipboardChange()
 A new feature onClipboardChange() which sets up a callback when the clipboard changes, think of the possibilities!
-```
+```js
 rk.onClipboardChange(function(data){
     if (typeof(data) != 'string'){ return; }
     if (data.indexOf('foobar') >= 0){
