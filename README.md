@@ -20,6 +20,36 @@ rk.addGlobalHotkey('Meta+Alt+N', function(){
 ```
 (Meta) means the Windows key
 
+And demonstrating some new functionality, this script will run notepad and wait for it to open
+```
+function fgWinMatches(winTitle){
+    var hwnd = rk.getForegroundWindow();
+        var title = rk.getWindowText(hwnd);
+	    if (title.toLowerCase().indexOf(winTitle.toLowerCase()) >= 0){
+	           return {hwnd:hwnd,title:title};
+		       }else{
+		              return false;
+			          }
+				  }
+
+				  function winWait(winTitle, callback){
+				     var match = fgWinMatches(winTitle);
+				        if (match === false){
+					      rk.setTimeout(function(){
+					               winWait(winTitle, callback);
+						             },400);
+							        }else{
+								     callback(match);
+								        }
+									}
+
+									rk.run('notepad');
+									winWait('notepad', function(match){
+									    rk.sendKeys('Hello World');
+									    });
+```
+
+
 Need Helpers
 ------------
 In order to make this a reality, I am going to need some passionate helpers to get this working, we need most all of the features which AutoHotkey has, and cross-platform.
