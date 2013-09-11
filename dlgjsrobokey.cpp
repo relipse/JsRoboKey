@@ -16,7 +16,7 @@
 DlgJsRoboKey::DlgJsRoboKey(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgJsRoboKey),
-    m_pjsrobokey(NULL)
+    m_pjsrobokey(NULL), m_jsengine(NULL)
 {
     ui->setupUi(this);
 
@@ -54,6 +54,7 @@ DlgJsRoboKey::DlgJsRoboKey(QWidget *parent) :
 
 DlgJsRoboKey::~DlgJsRoboKey()
 { 
+    delete m_jsengine;
     delete m_pjsrobokey;
     delete ui;
 }
@@ -64,11 +65,18 @@ DlgJsRoboKey::~DlgJsRoboKey()
  */
 void DlgJsRoboKey::initialize()
 {
-    m_rk = m_jsengine.newQObject(m_pjsrobokey);
-    m_jsengine.globalObject().setProperty("JsRoboKey", m_rk);
+    delete m_jsengine;
+    m_jsengine = new QJSEngine(this);
+    m_rk = m_jsengine->newQObject(m_pjsrobokey);
+    m_jsengine->globalObject().setProperty("JsRoboKey", m_rk);
 
     //allow rk for short
-    loadJS("jsrk = rk = JsRoboKey;", "JsRoboKey::initialize()");
+    //make some functions global scope
+    loadJS("jsrk = rk = JsRoboKey; "
+           "alert = rk.alert; "
+           "include = rk.include; "
+           "require = rk.require"
+           "__FILE__ = 'JsRoboKey::initialize()'; ", "JsRoboKey::initialize()");
 }
 
 
@@ -91,7 +99,7 @@ bool DlgJsRoboKey::loadJS(const QString &code, const QString& module_or_filename
     m_lastException = tr("");
     m_lastRunCode = code;
     m_lastRunFileOrModule = module_or_filename;
-    m_lastRunVal = m_jsengine.evaluate(code, module_or_filename);
+    m_lastRunVal = m_jsengine->evaluate(code, module_or_filename);
     if (m_lastRunVal.isError())
     {
         m_lastException = m_lastRunVal.toString();
@@ -111,11 +119,11 @@ void DlgJsRoboKey::on_btnInstaRun_clicked()
 
 QJSEngine *DlgJsRoboKey::jsengine()
 {
-   return &m_jsengine;
+   return m_jsengine;
 }
 
 
-
-
-
-
+void DlgJsRoboKey::on_btnUnloadAll_clicked()
+{
+    initialize();
+}

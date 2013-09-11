@@ -40,9 +40,11 @@ public:
 private slots:
     void on_btnInstaRun_clicked();
 
+    void on_btnUnloadAll_clicked();
+
 private:
     Ui::DlgJsRoboKey *ui;
-    QJSEngine m_jsengine;
+    QJSEngine* m_jsengine;
     QJSValue m_rk;
     QJSValue m_lastRunVal;
     QString m_lastException;

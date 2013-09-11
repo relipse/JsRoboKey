@@ -56,7 +56,9 @@ QString JsRoboKey::compilationDate()
 
 QString JsRoboKey::help()
 {
-    return "Available Methods:\n"
+    return  tr("JsRoboKey Help\n") +
+            tr("Compilation Date: %1\n").arg(compilationDate()) +
+            tr("Available Methods:\n")
             + getMethods();
 }
 
@@ -142,6 +144,17 @@ bool JsRoboKey::download(const QString &url, const QJSValue &callback_complete)
 }
 
 void JsRoboKey::openUrl(const QString &url)
+{
+    QDesktopServices::openUrl(QUrl(url));
+}
+
+void JsRoboKey::openFile(const QString &file)
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile(file));
+}
+
+//this does the same thing technically as above, but the url can be any type of file
+void JsRoboKey::open(const QString &url)
 {
     QDesktopServices::openUrl(QUrl(url));
 }

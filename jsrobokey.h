@@ -55,6 +55,9 @@ public slots:
         bool addGlobalHotkey(const QString& hotkey, const QJSValue& callback);
         bool download(const QString& url, const QJSValue &callback_complete);
         void openUrl(const QString& url);
+        void openFile(const QString& file);
+        void open(const QString& url);
+
         bool run(const QString& file, const QString &a1="", const QString &a2="", const QString &a3="", const QString &a4="", const QString &a5="", const QString &a6="");
         QString runWait(const QString& file, const QString& a1="");
         QString getIncludedFiles();
