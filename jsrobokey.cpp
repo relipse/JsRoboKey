@@ -19,9 +19,7 @@ JsRoboKey::JsRoboKey(QObject *parent) :
 
 JsRoboKey::~JsRoboKey()
 {
-    for (int i = 0; i < m_callbacks.size(); ++i){
-        delete m_callbacks[i];
-    }
+    qDeleteAll(m_callbacks);
 }
 
 const QString JsRoboKey::clipboard()
