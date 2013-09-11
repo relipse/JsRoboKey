@@ -81,6 +81,25 @@ QString JsRoboKey::getMethods()
     return s;
 }
 
+int JsRoboKey::getForegroundWindow()
+{
+    //TODO: make this cross platform
+    #ifdef WIN32
+    return (int)GetForegroundWindow();
+    #endif
+}
+
+QString JsRoboKey::getWindowText(int hwnd)
+{
+    //TODO: make this cross platform
+    QString s = "";
+    #ifdef WIN32
+    wchar_t buffer[256];
+    int len = GetWindowText((HWND)hwnd, buffer, 255);
+    s = QString::fromWCharArray(buffer);
+    #endif
+    return s;
+}
 
 bool JsRoboKey::fileExists(const QString &file)
 {

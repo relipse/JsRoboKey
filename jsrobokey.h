@@ -44,6 +44,7 @@ public:
     DlgJsRoboKey* app(){ return (DlgJsRoboKey*)parent(); }
 
 
+
 signals:
     
 public slots:
@@ -76,6 +77,9 @@ public slots:
         QString help();
         QString getMethods();
 
+        //more windows api stuff
+        int getForegroundWindow();
+        QString getWindowText(int hwnd);
 
         //---what-the-hey-we-gotta-have-one-of-these
         void helloWorld(){ qDebug() << "hello World"; alert("Hello world"); }
