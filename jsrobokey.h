@@ -45,10 +45,7 @@ public:
     ~JsRoboKey();
     DlgJsRoboKey* app(){ return (DlgJsRoboKey*)parent(); }
 
-
-
-
-    UINT ConvertDWORDKey(DWORD key, QString &keyname);
+    void clearAll();
 signals:
     
 public slots:
@@ -94,14 +91,24 @@ public slots:
         QString getWindowText(int hwnd);
         bool closeWindow(int hwnd);
 
-        int ensureKeyboardListener();
+        int allowKeyListen();
 
+        int onKeyPress(const QJSValue& callback);
+        int onKeyRelease(const QJSValue &callback);
 
-        void keyPressed(DWORD key);
-        void keyReleased(DWORD key);
+        bool clearOnKeyPress(int keypress_id);
+        bool clearOnKeyRelease(int keypress_id);
+
+        //yeah these are just events, technically the user could call them to force his scripts to think
+        //a key was actually pressed
+        void keyPressed(const QString &key);
+        void keyReleased(const QString &key);
         //--------------------------------------------
 private:
         SystemKeyboardReadWrite* m_pkeylistener;
+
+        QMap<int, QJSValue> m_keypress_callbacks;
+        QMap<int, QJSValue> m_keyrelease_callbacks;
 
         QStringList m_included_files;
         /**

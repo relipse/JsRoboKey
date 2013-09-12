@@ -20,7 +20,7 @@ DlgJsRoboKey::DlgJsRoboKey(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_pjsrobokey = new JsRoboKey(this);
+
 
     JSEdit& editor = *ui->memoInstaScript;
     editor.setWindowTitle("Insta Run");
@@ -49,6 +49,7 @@ DlgJsRoboKey::DlgJsRoboKey(QWidget *parent) :
     editor.setColor(JSEdit::BracketError,  QColor("#A82224"));
     editor.setColor(JSEdit::FoldIndicator, QColor("#555555"));
 
+    m_pjsrobokey = new JsRoboKey(this);
     initialize();
 }
 
@@ -65,8 +66,13 @@ DlgJsRoboKey::~DlgJsRoboKey()
  */
 void DlgJsRoboKey::initialize()
 {
+    //reload a couple objects, remeber delete NULL; does nothing
+    m_pjsrobokey->clearAll();
+
     delete m_jsengine;
     m_jsengine = new QJSEngine(this);
+
+
     m_rk = m_jsengine->newQObject(m_pjsrobokey);
     m_jsengine->globalObject().setProperty("JsRoboKey", m_rk);
 

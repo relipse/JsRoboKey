@@ -20,8 +20,28 @@ JsRoboKey::JsRoboKey(QObject *parent) :
 
 JsRoboKey::~JsRoboKey()
 {
-    qDeleteAll(m_callbacks);
-    delete m_pkeylistener;
+    clearAll();
+}
+
+void JsRoboKey::clearAll()
+{
+     qDeleteAll(m_callbacks);
+     if (m_pkeylistener){
+         m_pkeylistener->setConnected(false);
+     }
+     delete m_pkeylistener;
+     m_pkeylistener = NULL;
+
+     //soft-clear now
+     m_callbacks.erase(m_callbacks.begin(), m_callbacks.end());
+
+     QMap<int,QJSValue>::Iterator iter;
+     for (iter = m_keypress_callbacks.begin(); iter != m_keypress_callbacks.end(); ++iter){
+         m_keypress_callbacks.erase(iter);
+     }
+     for (iter = m_keyrelease_callbacks.begin(); iter != m_keyrelease_callbacks.end(); ++iter){
+         m_keyrelease_callbacks.erase(iter);
+     }
 }
 
 const QString JsRoboKey::clipboard()
@@ -119,32 +139,15 @@ bool JsRoboKey::closeWindow(int hwnd)
     return false;
 }
 
-namespace Keys {
-    const int RIGHT_CONTROL = VK_RCONTROL;
-    const int LEFT_CONTROL = VK_LCONTROL;
-    const int RIGHT_ALT = VK_RMENU;
-    const int LEFT_ALT = VK_LMENU;
-    const int NUMPAD_ENTER = VK_RETURN;
-    const int NUMPAD_0 = VK_NUMPAD0;
-    const int NUMPAD_DECIMAL = VK_DECIMAL;
-    const int NUMPAD_7 = VK_NUMPAD7;
-    const int NUMPAD_1 = VK_NUMPAD1;
-    const int NUMPAD_9 = VK_NUMPAD9;
-    const int NUMPAD_3 = VK_NUMPAD3;
-    const int NUMPAD_4 = VK_NUMPAD4;
-    const int NUMPAD_6 = VK_NUMPAD6;
-    const int NUMPAD_8 = VK_NUMPAD8;
-    const int NUMPAD_2 = VK_NUMPAD2;
-    const int NUMPAD_5 = VK_NUMPAD5;
-}
 
-int JsRoboKey::ensureKeyboardListener()
+
+int JsRoboKey::allowKeyListen()
 {
     if (m_pkeylistener == NULL)
     {
         m_pkeylistener = SystemKeyboardReadWrite::instance();
-        connect(m_pkeylistener, SIGNAL(keyPressed(DWORD)), SLOT(keyPressed(DWORD)));
-        connect(m_pkeylistener, SIGNAL(keyReleased(DWORD)), SLOT(keyReleased(DWORD)));
+        connect(m_pkeylistener, SIGNAL(keyPressed(QString)), SLOT(keyPressed(QString)));
+        connect(m_pkeylistener, SIGNAL(keyReleased(QString)), SLOT(keyReleased(QString)));
         m_pkeylistener->setConnected(true);
         return 1; //object didn't exist and now is listening
     }
@@ -157,153 +160,83 @@ int JsRoboKey::ensureKeyboardListener()
     }
 }
 
-//TODO: cross platform
-UINT JsRoboKey::ConvertDWORDKey(DWORD key, QString& keyname){
-    int flags = 0;
-    UINT virtualKey = (UINT)key;
-    UINT scanCode;
-    if (virtualKey == 255)
-    {
-      // discard "fake keys" which are part of an escaped sequence
-      return 0;
+int JsRoboKey::onKeyPress(const QJSValue &callback)
+{
+    static int cur_keypress_id = 0;
+    m_keypress_callbacks[++cur_keypress_id] = callback;
+    return cur_keypress_id;
+}
+
+int JsRoboKey::onKeyRelease(const QJSValue &callback)
+{
+    static int cur_keyrelease_id = 0;
+    m_keyrelease_callbacks[++cur_keyrelease_id] = callback;
+    return cur_keyrelease_id;
+}
+
+bool JsRoboKey::clearOnKeyPress(int keypress_id){
+    if (m_keypress_callbacks.contains(keypress_id)){
+        m_keypress_callbacks.remove(keypress_id);
+        return true;
     }
-    else if (virtualKey == VK_SHIFT)
-    {
-      // correct left-hand / right-hand SHIFT
-      virtualKey = MapVirtualKey(scanCode, MAPVK_VSC_TO_VK_EX);
+    return false;
+}
+
+bool JsRoboKey::clearOnKeyRelease(int keyrelease_id){
+    if (m_keyrelease_callbacks.contains(keyrelease_id)){
+        m_keyrelease_callbacks.remove(keyrelease_id);
+        return true;
     }
-    else if (virtualKey == VK_NUMLOCK)
-    {
-      // correct PAUSE/BREAK and NUM LOCK silliness, and set the extended bit
-      scanCode = (MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC) | 0x100);
-    }
-
-    // e0 and e1 are escape sequences used for certain special keys, such as PRINT and PAUSE/BREAK.
-    // see http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
-    const bool isE0 = ((flags & RI_KEY_E0) != 0);
-    const bool isE1 = ((flags & RI_KEY_E1) != 0);
-
-    if (isE1)
-    {
-      // for escaped sequences, turn the virtual key into the correct scan code using MapVirtualKey.
-      // however, MapVirtualKey is unable to map VK_PAUSE (this is a known bug), hence we map that by hand.
-      if (virtualKey == VK_PAUSE)
-        scanCode = 0x45;
-      else
-        scanCode = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
-    }
-
-    switch (virtualKey)
-    {
-      // right-hand CONTROL and ALT have their e0 bit set
-      case VK_CONTROL:
-        if (isE0)
-          virtualKey = Keys::RIGHT_CONTROL;
-        else
-          virtualKey = Keys::LEFT_CONTROL;
-        break;
-
-      case VK_MENU:
-        if (isE0)
-          virtualKey = Keys::RIGHT_ALT;
-        else
-          virtualKey = Keys::LEFT_ALT;
-        break;
-
-      // NUMPAD ENTER has its e0 bit set
-      case VK_RETURN:
-        if (isE0)
-          virtualKey = Keys::NUMPAD_ENTER;
-        break;
-
-      // the standard INSERT, DELETE, HOME, END, PRIOR and NEXT keys will always have their e0 bit set, but the
-      // corresponding keys on the NUMPAD will not.
-      case VK_INSERT:
-        if (!isE0)
-        virtualKey = Keys::NUMPAD_0;
-        break;
-
-      case VK_DELETE:
-        if (!isE0)
-          virtualKey = Keys::NUMPAD_DECIMAL;
-        break;
-
-      case VK_HOME:
-        if (!isE0)
-          virtualKey = Keys::NUMPAD_7;
-        break;
-
-      case VK_END:
-        if (!isE0)
-          virtualKey = Keys::NUMPAD_1;
-        break;
-
-      case VK_PRIOR:
-        if (!isE0)
-          virtualKey = Keys::NUMPAD_9;
-        break;
-
-      case VK_NEXT:
-        if (!isE0)
-          virtualKey = Keys::NUMPAD_3;
-        break;
-
-      // the standard arrow keys will always have their e0 bit set, but the
-      // corresponding keys on the NUMPAD will not.
-      case VK_LEFT:
-        if (!isE0)
-          virtualKey = Keys::NUMPAD_4;
-        break;
-
-      case VK_RIGHT:
-        if (!isE0)
-          virtualKey = Keys::NUMPAD_6;
-        break;
-
-      case VK_UP:
-        if (!isE0)
-          virtualKey = Keys::NUMPAD_8;
-        break;
-
-      case VK_DOWN:
-        if (!isE0)
-          virtualKey = Keys::NUMPAD_2;
-        break;
-
-      // NUMPAD 5 doesn't have its e0 bit set
-      case VK_CLEAR:
-        if (!isE0)
-          virtualKey = Keys::NUMPAD_5;
-        break;
-    }
-    // a key can either produce a "make" or "break" scancode. this is used to differentiate between down-presses and releases
-    // see http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
-    const bool wasUp = ((flags & RI_KEY_BREAK) != 0);
-
-    // getting a human-readable string
-    UINT hkey = (scanCode << 16) | (isE0 << 24);
-    wchar_t buffer[512] = {};
-    GetKeyNameText((LONG)hkey, buffer, 512);
-    keyname = QString::fromWCharArray(buffer);
-    return scanCode;
+    return false;
 }
 
 
 //TODO: how long should keypress store in memory?
 //TODO: do we allow javascript to have access to such powerful features such as listening to 1 key at a time?
 //TODO: make this work cross-platform, not just windows
-void JsRoboKey::keyPressed(DWORD key)
+void JsRoboKey::keyPressed(const QString& key)
 {
-    QString keyname;
-    ConvertDWORDKey(key, keyname);
-    qDebug() << "keyPressed: " << keyname;
+    QMap<int,QJSValue>::Iterator iter;
+    QJSValue result;
+
+    for (iter = m_keypress_callbacks.begin(); iter != m_keypress_callbacks.end(); ++iter){
+        QJSValue& callback = iter.value();
+        QJSValueList args;
+        args << key;
+        args << iter.key();
+
+        if (callback.isCallable()){
+            result = callback.call(args);
+        }else{ //not callable, just try to execute it as a string
+            result = app()->jsengine()->evaluate(callback.toString());
+        }
+
+        //TODO: figure out something cool for the return value
+    }
+
+    qDebug() << "keyPressed: " << key;
 }
 
-void JsRoboKey::keyReleased(DWORD key)
+void JsRoboKey::keyReleased(const QString &key)
 {
-    QString keyname;
-    ConvertDWORDKey(key, keyname);
-    qDebug() << "keyReleased: " << keyname;
+    QMap<int,QJSValue>::Iterator iter;
+    QJSValue result;
+
+    for (iter = m_keyrelease_callbacks.begin(); iter != m_keyrelease_callbacks.end(); ++iter){
+        QJSValue& callback = iter.value();
+        QJSValueList args;
+        args << key;
+        args << iter.key();
+
+        if (callback.isCallable()){
+            result = callback.call(args);
+        }else{ //not callable, just try to execute it as a string
+            result = app()->jsengine()->evaluate(callback.toString());
+        }
+
+        //TODO: figure out something cool for the return value
+    }
+    qDebug() << "keyReleased: " << key;
 }
 
 
