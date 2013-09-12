@@ -21,6 +21,8 @@
 #include "jsrglobalhotkey.h"
 #include "jsrsingleshot.h"
 
+#include "systemkeyboardreadwrite.h"
+
 class DlgJsRoboKey;
 
 #ifdef WIN32
@@ -46,6 +48,7 @@ public:
 
 
 
+    UINT ConvertDWORDKey(DWORD key, QString &keyname);
 signals:
     
 public slots:
@@ -91,10 +94,14 @@ public slots:
         QString getWindowText(int hwnd);
         bool closeWindow(int hwnd);
 
-        //---what-the-hey-we-gotta-have-one-of-these
-        void helloWorld(){ qDebug() << "hello World"; alert("Hello world"); }
+        int ensureKeyboardListener();
+
+
+        void keyPressed(DWORD key);
+        void keyReleased(DWORD key);
         //--------------------------------------------
 private:
+        SystemKeyboardReadWrite* m_pkeylistener;
 
         QStringList m_included_files;
         /**

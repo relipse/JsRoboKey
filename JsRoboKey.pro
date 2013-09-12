@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     jsrdownload.cpp \
     jsrglobalhotkey.cpp \
     jsrsingleshot.cpp \
-    jsrclipboardchange.cpp
+    jsrclipboardchange.cpp \
+    systemkeyboardreadwrite.cpp
 
 HEADERS  += dlgjsrobokey.h \
     jsrobokey.h \
@@ -39,7 +40,8 @@ HEADERS  += dlgjsrobokey.h \
     jsrdownload.h \
     jsrglobalhotkey.h \
     jsrsingleshot.h \
-    jsrclipboardchange.h
+    jsrclipboardchange.h \
+    systemkeyboardreadwrite.h
 
 HEADERS += jsedit.h
 
