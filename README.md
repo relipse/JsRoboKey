@@ -65,6 +65,17 @@ rk.onClipboardChange(function(data){
 });
 ```
 
+###### onKeyPress() onKeyRelease()
+unstable in hotfix_keylisten branch
+```js
+rk.allowKeyListen();
+rk.onKeyRelease(function(key){
+   if (key == 'F7'){
+     rk.sendKeys('Hello World F7'); 
+   }
+});
+```
+
 Need Helpers
 ------------
 In order to make this a reality, I am going to need some passionate helpers to get this working, we need most all of the features which AutoHotkey has, and cross-platform.
