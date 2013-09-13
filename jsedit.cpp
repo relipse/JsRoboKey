@@ -824,6 +824,25 @@ bool JSEdit::isFolded(int line) const
     return !block.isVisible();
 }
 
+void JSEdit::keyPressEvent(QKeyEvent *e)
+{
+    if ((e->modifiers()==Qt::ControlModifier)){
+        if ((e->key()==Qt::Key_Return)){
+            emit onCtrlEnter();
+            if (m_suppressCtrlEnter){
+                return;  //suppress ctrl enter
+            }
+        }else if (e->key()==Qt::Key_Space){
+            emit onCtrlSpace();
+            if (m_suppressCtrlSpace){
+                return;  //suppress ctrl enter
+            }
+        }
+    }
+    e->accept();
+    QPlainTextEdit::keyPressEvent(e);
+}
+
 void JSEdit::fold(int line)
 {
     QTextBlock startBlock = document()->findBlockByNumber(line - 1);
@@ -1037,3 +1056,25 @@ void JSEdit::mark(const QString &str, Qt::CaseSensitivity sens)
 {
     d_ptr->highlighter->mark(str, sens);
 }
+
+
+bool JSEdit::suppressCtrlSpace() const
+{
+    return m_suppressCtrlSpace;
+}
+
+void JSEdit::setSuppressCtrlSpace(bool suppressCtrlSpace)
+{
+    m_suppressCtrlSpace = suppressCtrlSpace;
+}
+
+bool JSEdit::suppressCtrlEnter() const
+{
+    return m_suppressCtrlEnter;
+}
+
+void JSEdit::setSuppressCtrlEnter(bool suppressCtrlEnter)
+{
+    m_suppressCtrlEnter = suppressCtrlEnter;
+}
+

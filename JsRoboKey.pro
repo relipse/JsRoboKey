@@ -47,3 +47,6 @@ FORMS    += dlgjsrobokey.ui
 
 
 VERSION = 130805
+
+RESOURCES += \
+    resources.qrc
