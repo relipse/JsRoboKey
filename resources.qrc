@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>jsrobokeyicon1.icns</file>
+        <file>jsrobokeyicon1.ico</file>
+        <file>jsrobokeyicon1.png</file>
+    </qresource>
+</RCC>

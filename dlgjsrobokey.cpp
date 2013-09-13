@@ -49,7 +49,120 @@ DlgJsRoboKey::DlgJsRoboKey(QWidget *parent) :
     editor.setColor(JSEdit::BracketError,  QColor("#A82224"));
     editor.setColor(JSEdit::FoldIndicator, QColor("#555555"));
 
+    createActions();
+    createTrayIcon();
+
+    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+                this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+
+    setIcon(1);
+    trayIcon->show();
+
+
+    //initalize the v8 engine
     initialize();
+}
+
+void  DlgJsRoboKey::createActions()
+{
+    minimizeAction = new QAction(tr("Mi&nimize"), this);
+    connect(minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
+
+    maximizeAction = new QAction(tr("Ma&ximize"), this);
+    connect(maximizeAction, SIGNAL(triggered()), this, SLOT(showMaximized()));
+
+    restoreAction = new QAction(tr("&Restore"), this);
+    connect(restoreAction, SIGNAL(triggered()), this, SLOT(showNormal()));
+
+    quitAction = new QAction(tr("&Quit"), this);
+    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+}
+
+
+void DlgJsRoboKey::createTrayIcon()
+{
+    trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(minimizeAction);
+    trayIconMenu->addAction(maximizeAction);
+    trayIconMenu->addAction(restoreAction);
+    trayIconMenu->addSeparator();
+    trayIconMenu->addAction(quitAction);
+
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(trayIconMenu);
+}
+
+void DlgJsRoboKey::showMessage(const QString& title, const QString& body, int iicon, int ms_duration, const QJSValue& callback,
+                               const QString& action, const QString& param1)
+ {
+    //actions are to be defined in nature
+    //TODO: notice, this will screw up the previous callback, does it matter?
+    trayJsCallback = callback;
+    trayAction = action;
+    trayParam1 = param1;
+    // NoIcon, Information, Warning, Critical
+    QSystemTrayIcon::MessageIcon icon = (QSystemTrayIcon::MessageIcon)iicon;
+    trayIcon->showMessage(title, body, icon, ms_duration);
+ }
+
+
+void DlgJsRoboKey::setVisible(bool visible)
+{
+    minimizeAction->setEnabled(visible);
+    maximizeAction->setEnabled(!isMaximized());
+    restoreAction->setEnabled(isMaximized() || !visible);
+    QDialog::setVisible(visible);
+}
+
+void DlgJsRoboKey::closeEvent(QCloseEvent *event)
+ {
+     if (trayIcon->isVisible()) {
+         /*
+         QMessageBox::information(this, tr("Systray"),
+                                  tr("The program will keep running in the "
+                                     "system tray. To terminate the program, "
+                                     "choose <b>Quit</b> in the context menu "
+                                     "of the system tray entry."));*/
+         showMessage("JsRoboKey is still running in the tray",
+                     "To exit the program completly and all running scripts, Right click -> quit ", 1);
+         hide();
+         event->ignore();
+     }
+ }
+
+void DlgJsRoboKey::messageClicked()
+ {
+     //TODO: depending on the action we need to do something
+    if (trayJsCallback.isCallable()){
+        trayJsCallback.call();
+        //it was already called, now make it undefined
+        trayJsCallback = QJSValue();
+    }
+ }
+
+void DlgJsRoboKey::iconActivated(QSystemTrayIcon::ActivationReason reason)
+ {
+     switch (reason) {
+     case QSystemTrayIcon::Trigger:
+     case QSystemTrayIcon::DoubleClick:
+         //do something
+         setVisible(true);
+         break;
+     case QSystemTrayIcon::MiddleClick:
+         //what the heck are we going to do with a middle click?
+         break;
+     default:
+         ;
+     }
+ }
+
+void DlgJsRoboKey::setIcon(int index)
+{
+
+    QIcon icon = QIcon(tr(":/jsrobokeyicon%1.png").arg(index));
+    trayIcon->setIcon(icon);
+    setWindowIcon(icon);
 }
 
 DlgJsRoboKey::~DlgJsRoboKey()
