@@ -79,11 +79,17 @@ rk.onKeyRelease(function(key){
 ###### trayMsg()
 demonstrating a few of the latest features as well,
 after the tray bubble message gets shown, the callback gets called when the user clicks the tray message
-```
-rk.trayMsg('Hi','Click here for details...', function(){
+```js
+rk.trayMsg('Hi','Check if JsRoboKey executable file exists...', function(){
    alert(__APPFILEPATH__ + ' exists: ' + 
-           rk.fileExists(__APPFILEPATH__)
+           rk.fileExists(__APPFILEPATH__));
 });
+
+
+rk.trayMsg('About','Click to open the JsRoboKey website', function(){
+    rk.openUrl('http://github.com/relipse/JsRoboKey');
+});
+
 ```
 
 
