@@ -91,6 +91,11 @@ public slots:
         QString getWindowText(int hwnd);
         bool closeWindow(int hwnd);
 
+        bool trayMsg(const QString &title, const QString &body);
+        bool trayMsg(const QString &title, const QString &body, const QJSValue &callback,
+                             int iicon = 0, int ms_duration = 3500);
+
+
         //---what-the-hey-we-gotta-have-one-of-these
         void helloWorld(){ qDebug() << "hello World"; alert("Hello world"); }
         //--------------------------------------------

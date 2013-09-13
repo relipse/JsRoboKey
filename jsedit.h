@@ -82,6 +82,14 @@ public:
     bool isFoldable(int line) const;
     bool isFolded(int line) const;
 
+    void keyPressEvent(QKeyEvent *e);
+
+    bool suppressCtrlEnter() const;
+    void setSuppressCtrlEnter(bool suppressCtrlEnter);
+
+    bool suppressCtrlSpace() const;
+    void setSuppressCtrlSpace(bool suppressCtrlSpace);
+
 public slots:
     void updateSidebar();
     void mark(const QString &str, Qt::CaseSensitivity sens = Qt::CaseInsensitive);
@@ -93,6 +101,13 @@ public slots:
     void fold(int line);
     void unfold(int line);
     void toggleFold(int line);
+
+signals:
+    void onCtrlEnter();
+    void onCtrlSpace();
+private:
+    bool m_suppressCtrlEnter;
+    bool m_suppressCtrlSpace;
 
 protected:
     void resizeEvent(QResizeEvent *e);

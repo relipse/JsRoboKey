@@ -118,6 +118,19 @@ bool JsRoboKey::closeWindow(int hwnd)
     return false;
 }
 
+bool JsRoboKey::trayMsg(const QString &title, const QString &body)
+{
+    app()->showTrayMessage(title, body);
+    return true;
+}
+
+bool JsRoboKey::trayMsg(const QString &title, const QString &body, const QJSValue& callback,
+                                int iicon, int ms_duration)
+{
+    app()->showTrayMessage(title, body, callback, iicon, ms_duration);
+    return true;
+}
+
 bool JsRoboKey::fileExists(const QString &file)
 {
     QFile f(file);

@@ -14,11 +14,16 @@
 #include "jsrobokey.h"
 
 DlgJsRoboKey::DlgJsRoboKey(QWidget *parent) :
-    QDialog(parent),
+    QDialog(parent, Qt::Window | Qt::WindowSystemMenuHint
+            | Qt::WindowMinimizeButtonHint
+            | Qt::WindowMaximizeButtonHint
+            | Qt::WindowCloseButtonHint),
     ui(new Ui::DlgJsRoboKey),
     m_pjsrobokey(NULL), m_jsengine(NULL)
 {
     ui->setupUi(this);
+    ui->memoInstaScript->setSuppressCtrlEnter(true);
+    connect(ui->memoInstaScript, SIGNAL(onCtrlEnter()), this, SLOT(on_btnInstaRun_clicked()));
 
     m_pjsrobokey = new JsRoboKey(this);
 
@@ -52,7 +57,7 @@ DlgJsRoboKey::DlgJsRoboKey(QWidget *parent) :
     createActions();
     createTrayIcon();
 
-    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
+    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(on_trayMessageClicked()));
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                 this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
 
@@ -93,9 +98,11 @@ void DlgJsRoboKey::createTrayIcon()
     trayIcon->setContextMenu(trayIconMenu);
 }
 
-void DlgJsRoboKey::showMessage(const QString& title, const QString& body, int iicon, int ms_duration, const QJSValue& callback,
-                               const QString& action, const QString& param1)
+void DlgJsRoboKey::showTrayMessage(const QString& title, const QString& body, const QJSValue &callback,
+                                   int iicon, int ms_duration,
+                                   const QString& action, const QString& param1)
  {
+
     //actions are to be defined in nature
     //TODO: notice, this will screw up the previous callback, does it matter?
     trayJsCallback = callback;
@@ -103,6 +110,7 @@ void DlgJsRoboKey::showMessage(const QString& title, const QString& body, int ii
     trayParam1 = param1;
     // NoIcon, Information, Warning, Critical
     QSystemTrayIcon::MessageIcon icon = (QSystemTrayIcon::MessageIcon)iicon;
+    if (ms_duration == 0){ ms_duration = 3500; }
     trayIcon->showMessage(title, body, icon, ms_duration);
  }
 
@@ -118,27 +126,23 @@ void DlgJsRoboKey::setVisible(bool visible)
 void DlgJsRoboKey::closeEvent(QCloseEvent *event)
  {
      if (trayIcon->isVisible()) {
-         /*
-         QMessageBox::information(this, tr("Systray"),
-                                  tr("The program will keep running in the "
-                                     "system tray. To terminate the program, "
-                                     "choose <b>Quit</b> in the context menu "
-                                     "of the system tray entry."));*/
-         showMessage("JsRoboKey is still running in the tray",
-                     "To exit the program completly and all running scripts, Right click -> quit ", 1);
+         showTrayMessage("JsRoboKey is still running.",
+                     "To exit the program completely and all running scripts, Right click -> quit ");
          hide();
          event->ignore();
      }
  }
 
-void DlgJsRoboKey::messageClicked()
+void DlgJsRoboKey::on_trayMessageClicked()
  {
-     //TODO: depending on the action we need to do something
+    //TODO: FIX: this stupid trayJsCallback always ends up being undefined.
+    //TODO: depending on the action we need to do something
     if (trayJsCallback.isCallable()){
         trayJsCallback.call();
         //it was already called, now make it undefined
-        trayJsCallback = QJSValue();
     }
+    trayJsCallback = QJSValue();
+    //m_pjsrobokey->alert("tray clicked!!","");
  }
 
 void DlgJsRoboKey::iconActivated(QSystemTrayIcon::ActivationReason reason)
@@ -146,8 +150,8 @@ void DlgJsRoboKey::iconActivated(QSystemTrayIcon::ActivationReason reason)
      switch (reason) {
      case QSystemTrayIcon::Trigger:
      case QSystemTrayIcon::DoubleClick:
-         //do something
-         setVisible(true);
+         //restore the app
+         showNormal();
          break;
      case QSystemTrayIcon::MiddleClick:
          //what the heck are we going to do with a middle click?
@@ -159,10 +163,15 @@ void DlgJsRoboKey::iconActivated(QSystemTrayIcon::ActivationReason reason)
 
 void DlgJsRoboKey::setIcon(int index)
 {
-
     QIcon icon = QIcon(tr(":/jsrobokeyicon%1.png").arg(index));
     trayIcon->setIcon(icon);
     setWindowIcon(icon);
+}
+
+void DlgJsRoboKey::showTrayMessage(const QString &title, const QString &body)
+{
+    QJSValue undefined;
+    showTrayMessage(title, body, undefined);
 }
 
 DlgJsRoboKey::~DlgJsRoboKey()
@@ -182,14 +191,18 @@ void DlgJsRoboKey::initialize()
     m_jsengine = new QJSEngine(this);
     m_rk = m_jsengine->newQObject(m_pjsrobokey);
     m_jsengine->globalObject().setProperty("JsRoboKey", m_rk);
+    m_jsengine->globalObject().setProperty("__APPFILEPATH__", QCoreApplication::applicationFilePath());
+    m_jsengine->globalObject().setProperty("__APPDIRPATH__", QCoreApplication::applicationDirPath());
+    m_jsengine->globalObject().setProperty("__HOMEPATH__", QDir::homePath());
 
+
+    //QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
     //allow rk for short
     //make some functions global scope
     loadJS("jsrk = rk = JsRoboKey; "
            "alert = rk.alert; "
            "include = rk.include; "
-           "require = rk.require"
-           "__FILE__ = 'JsRoboKey::initialize()'; ", "JsRoboKey::initialize()");
+           "require = rk.require", "JsRoboKey::initialize()");
 }
 
 
@@ -207,11 +220,21 @@ bool DlgJsRoboKey::loadJSFile(const QString &file)
     return loadJS(contents, file);
 }
 
+
 bool DlgJsRoboKey::loadJS(const QString &code, const QString& module_or_filename)
-{
+{    
+    static int num_loadjs_calls = 0;
+    num_loadjs_calls++;
+    QString plural = (num_loadjs_calls > 1 ? "s" : "");
+    trayIcon->setToolTip(tr("JsRoboKey (%1 loadJS call%2 made.)")
+                         .arg(num_loadjs_calls).arg(plural));
+
     m_lastException = tr("");
     m_lastRunCode = code;
     m_lastRunFileOrModule = module_or_filename;
+    //prior to evaluation we want to store the module_or_filename in __FILE__
+    //that the script itself can use
+    m_jsengine->globalObject().setProperty("__FILE__", QJSValue(module_or_filename));
     m_lastRunVal = m_jsengine->evaluate(code, module_or_filename);
     if (m_lastRunVal.isError())
     {

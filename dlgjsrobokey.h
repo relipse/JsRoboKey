@@ -40,16 +40,19 @@ public:
     QJSEngine* jsengine();
 
     void setIcon(int index = 1);
-    void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void showMessage(const QString &title, const QString &body, int iicon = 0,
-                     int ms_duration = 3500, const QJSValue &callback = QJSValue(), const QString &action="", const QString &param1="");
+
+    void showTrayMessage(const QString &title, const QString &body);
+    void showTrayMessage(const QString &title, const QString &body, const QJSValue &callback, int iicon = 0,
+                         int ms_duration = 3500, const QString &action="", const QString &param1="");
+
     void setVisible(bool visible);
     void createTrayIcon();
     void createActions();
 private slots:
     void on_btnInstaRun_clicked();
     void on_btnUnloadAll_clicked();
-    void messageClicked();
+    void on_trayMessageClicked();
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
 
 protected:
     virtual void closeEvent(QCloseEvent *event);
