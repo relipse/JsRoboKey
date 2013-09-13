@@ -66,7 +66,7 @@ rk.onClipboardChange(function(data){
 ```
 
 ###### onKeyPress() onKeyRelease()
-unstable in hotfix_keylisten branch
+*unstable* not yet in master (hotfix_keylisten branch)
 ```js
 rk.allowKeyListen();
 rk.onKeyRelease(function(key){
@@ -75,6 +75,17 @@ rk.onKeyRelease(function(key){
    }
 });
 ```
+
+###### trayMsg()
+demonstrating a few of the latest features as well,
+after the tray bubble message gets shown, the callback gets called when the user clicks the tray message
+```
+rk.trayMsg('Hi','Click here for details...', function(){
+   alert(__APPFILEPATH__ + ' exists: ' + 
+           rk.fileExists(__APPFILEPATH__)
+});
+```
+
 
 Need Helpers
 ------------
