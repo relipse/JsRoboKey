@@ -649,8 +649,43 @@ public:
     bool codeFolding : 1;
 };
 
+short JSEdit::tabsToSpaces() const
+{
+    return m_tabsToSpaces;
+}
+
+void JSEdit::setTabsToSpaces(short tabsToSpaces)
+{
+    m_tabsToSpaces = tabsToSpaces;
+}
+
+
+QString JSEdit::forcedNewline() const
+{
+    return m_forcedNewline;
+}
+
+void JSEdit::setForcedNewline(const QString &forcedNewline)
+{
+    m_forcedNewline = forcedNewline;
+}
+
+QString JSEdit::indentChars() const
+{
+    return m_indentChars;
+}
+
+void JSEdit::setIndentChars(const QString &indentChars)
+{
+    m_indentChars = indentChars;
+}
+
+
 JSEdit::JSEdit(QWidget *parent)
-    : QPlainTextEdit(parent)
+    : QPlainTextEdit(parent),
+      m_tabsToSpaces(4),
+      m_indentChars("    "),
+      m_forcedNewline("\n")
     , d_ptr(new JSEditPrivate)
 {
     d_ptr->editor = this;
@@ -826,6 +861,31 @@ bool JSEdit::isFolded(int line) const
 
 void JSEdit::keyPressEvent(QKeyEvent *e)
 {
+    if (e->modifiers() == Qt::NoModifier)
+    {
+        if (e->key() == Qt::Key_Tab){
+            QString selText = textCursor().selectedText();
+            if (selText.isEmpty())
+            {
+                if (m_tabsToSpaces > 0){
+                    QString ins_s = "";
+                    for (short i = 0; i < m_tabsToSpaces; ++i){
+                        ins_s += " ";
+                    }
+                    insertPlainText(ins_s);
+                    return; //suppress tab
+                }
+            }else{
+                //user selected text and pressed tab
+                //there is good chances he wants to indent that text
+                //so lets shift it right x spaces
+                QRegularExpression re("^(\\s*)");
+                re.setPatternOptions(QRegularExpression::MultilineOption);
+                QString indentedText = selText.replace(re,tr("\\1") + m_indentChars);
+                insertPlainText(indentedText);
+            }
+        }
+    }
     if ((e->modifiers()==Qt::ControlModifier)){
         if ((e->key()==Qt::Key_Return)){
             emit onCtrlEnter();

@@ -90,6 +90,15 @@ public:
     bool suppressCtrlSpace() const;
     void setSuppressCtrlSpace(bool suppressCtrlSpace);
 
+    short tabsToSpaces() const;
+    void setTabsToSpaces(short tabsToSpaces);
+
+    QString forcedNewline() const;
+    void setForcedNewline(const QString &forcedNewline);
+
+    QString indentChars() const;
+    void setIndentChars(const QString &indentChars);
+
 public slots:
     void updateSidebar();
     void mark(const QString &str, Qt::CaseSensitivity sens = Qt::CaseInsensitive);
@@ -108,6 +117,9 @@ signals:
 private:
     bool m_suppressCtrlEnter;
     bool m_suppressCtrlSpace;
+    short int m_tabsToSpaces;
+    QString m_indentChars;
+    QString m_forcedNewline;
 
 protected:
     void resizeEvent(QResizeEvent *e);
