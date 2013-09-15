@@ -859,15 +859,35 @@ bool JSEdit::isFolded(int line) const
     return !block.isVisible();
 }
 
+const QString& JSEdit::unindent(QString& s){
+    QString indentCharsRegex = m_indentChars;
+    indentCharsRegex.replace(" "," ?");
+    QRegularExpression re("/^( *?)("+indentCharsRegex+")([^\\s])");
+    re.setPatternOptions(QRegularExpression::MultilineOption);
+   return s.replace(re, "\\1\\3");
+}
+
+
+const QString& JSEdit::indent(QString& s){
+    QString indentCharsRegex = m_indentChars;
+    indentCharsRegex.replace(" "," ?");
+    QRegularExpression re("/^( *?)("+indentCharsRegex+")([^\\s])");
+    re.setPatternOptions(QRegularExpression::MultilineOption);
+   return s.replace(re, "\\1\\3");
+}
+
+
 void JSEdit::keyPressEvent(QKeyEvent *e)
 {
     if (e->modifiers() == Qt::NoModifier)
     {
         if (e->key() == Qt::Key_Tab){
-            QString selText = textCursor().selectedText();
+            QTextDocumentFragment frag = textCursor().selection();
+            QString selText = frag.toPlainText();
+
             if (selText.isEmpty())
             {
-                if (m_tabsToSpaces > 0){
+               if (m_tabsToSpaces > 0){
                     QString ins_s = "";
                     for (short i = 0; i < m_tabsToSpaces; ++i){
                         ins_s += " ";
@@ -881,12 +901,31 @@ void JSEdit::keyPressEvent(QKeyEvent *e)
                 //so lets shift it right x spaces
                 QRegularExpression re("^(\\s*)");
                 re.setPatternOptions(QRegularExpression::MultilineOption);
-                QString indentedText = selText.replace(re,tr("\\1") + m_indentChars);
+
+                QString indentedText = selText.replace(re,("\\1") + m_indentChars);
+
                 insertPlainText(indentedText);
+                return; //suppress tab
             }
         }
     }
-    if ((e->modifiers()==Qt::ControlModifier)){
+    else if (e->modifiers() == Qt::ShiftModifier){
+        //unindent text block
+        if (e->key() == Qt::Key_Tab){
+            QTextDocumentFragment frag = textCursor().selection();
+            QString selText = frag.toPlainText();
+            if (selText.isEmpty()){
+                if (m_tabsToSpaces > 0){
+                     insertPlainText(unindent(selText));
+                     return; //suppress tab
+                 }
+            }else{
+                insertPlainText(unindent(selText));
+                return; //suppress actual tab key
+            }
+        }
+    }
+    else if ((e->modifiers()==Qt::ControlModifier)){
         if ((e->key()==Qt::Key_Return)){
             emit onCtrlEnter();
             if (m_suppressCtrlEnter){

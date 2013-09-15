@@ -99,7 +99,9 @@ public:
     QString indentChars() const;
     void setIndentChars(const QString &indentChars);
 
-public slots:
+    const QString &unindent(QString &s);
+    const QString &indent(QString &s);
+ public slots:
     void updateSidebar();
     void mark(const QString &str, Qt::CaseSensitivity sens = Qt::CaseInsensitive);
     void setBracketsMatchingEnabled(bool enable);
