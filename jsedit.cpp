@@ -862,19 +862,56 @@ bool JSEdit::isFolded(int line) const
 const QString& JSEdit::unindent(QString& s){
     QString indentCharsRegex = m_indentChars;
     indentCharsRegex.replace(" "," ?");
-    QRegularExpression re("/^( *?)("+indentCharsRegex+")([^\\s])");
+    QString sre = "^( *?)("+indentCharsRegex+")([^\\s])";
+    QRegularExpression re(sre);
     re.setPatternOptions(QRegularExpression::MultilineOption);
-   return s.replace(re, "\\1\\3");
+    return s.replace(re, "\\1\\3");
 }
 
 
 const QString& JSEdit::indent(QString& s){
-    QString indentCharsRegex = m_indentChars;
-    indentCharsRegex.replace(" "," ?");
-    QRegularExpression re("/^( *?)("+indentCharsRegex+")([^\\s])");
+    QRegularExpression re("^(\\s*)");
     re.setPatternOptions(QRegularExpression::MultilineOption);
-   return s.replace(re, "\\1\\3");
+    return s.replace(re,("\\1") + m_indentChars);
 }
+
+void JSEdit::selectLine(int position){
+    QTextCursor cursor = textCursor();
+    if (position == -1){
+        position = cursor.position();
+    }
+    cursor.clearSelection();
+    cursor.setPosition(position);
+    cursor.movePosition(QTextCursor::StartOfBlock);
+    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+    setTextCursor(cursor);
+}
+
+
+void JSEdit::selectBlock(int pos, int anc){
+    QTextCursor cursor = textCursor();
+    if (pos == -1){
+        pos = cursor.position();
+    }
+    if (anc == -1){
+        anc = cursor.anchor();
+    }
+
+    //reverse if necessary
+    if (anc < pos){
+        int temp = pos;
+        pos = anc;
+        anc = temp;
+    }
+
+    cursor.setPosition(pos);
+    cursor.movePosition(QTextCursor::StartOfBlock);
+    cursor.setPosition(anc, QTextCursor::KeepAnchor);
+    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+    setTextCursor(cursor);
+}
+
+
 
 
 void JSEdit::keyPressEvent(QKeyEvent *e)
@@ -895,35 +932,66 @@ void JSEdit::keyPressEvent(QKeyEvent *e)
                     insertPlainText(ins_s);
                     return; //suppress tab
                 }
-            }else{
+            }else{ // T A B   I N D E N T   B L O C K
+                selectBlock();
                 //user selected text and pressed tab
                 //there is good chances he wants to indent that text
                 //so lets shift it right x spaces
-                QRegularExpression re("^(\\s*)");
-                re.setPatternOptions(QRegularExpression::MultilineOption);
-
-                QString indentedText = selText.replace(re,("\\1") + m_indentChars);
-
-                insertPlainText(indentedText);
+                QString indentedText = textCursor().selection().toPlainText();
+                indent(indentedText);
+                QTextCursor cursor = textCursor();
+                int startPos = cursor.position();
+                cursor.insertText(indentedText);
+                cursor.setPosition(startPos);
+                int endPos = cursor.position()+indentedText.length();
+                int fullLength = toPlainText().length();
+                if (endPos > fullLength){
+                    endPos = fullLength;
+                }
+                cursor.setPosition(endPos, QTextCursor::KeepAnchor);
+                setTextCursor(cursor);
+                selectBlock();
                 return; //suppress tab
             }
         }
     }
     else if (e->modifiers() == Qt::ShiftModifier){
         //unindent text block
-        if (e->key() == Qt::Key_Tab){
+        if (e->key() == Qt::Key_Backtab){
+
+            // S H I F T + T A B   U N - I N D E N T   B L O C K
+
             QTextDocumentFragment frag = textCursor().selection();
             QString selText = frag.toPlainText();
             if (selText.isEmpty()){
+                //select whole line and then unindent
                 if (m_tabsToSpaces > 0){
-                     insertPlainText(unindent(selText));
                      return; //suppress tab
+                 }else{
+                    //do not suppress tab
                  }
-            }else{
-                insertPlainText(unindent(selText));
+            }else{ //user selected text
+                selectBlock();
+                QTextCursor cursor = textCursor();
+                selText = cursor.selection().toPlainText();
+                unindent(selText);
+
+
+                int startPos = cursor.position();
+                cursor.insertText(selText);
+                int endPos = cursor.position()+selText.length();
+                int fullLength = toPlainText().length();
+                if (endPos > fullLength){
+                    endPos = fullLength;
+                }
+
+                cursor.setPosition(startPos);
+                cursor.setPosition(endPos, QTextCursor::KeepAnchor);
+                setTextCursor(cursor);
+                selectBlock();
                 return; //suppress actual tab key
             }
-        }
+        }//end if Shift+Tab
     }
     else if ((e->modifiers()==Qt::ControlModifier)){
         if ((e->key()==Qt::Key_Return)){

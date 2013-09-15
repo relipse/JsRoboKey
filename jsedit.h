@@ -101,7 +101,9 @@ public:
 
     const QString &unindent(QString &s);
     const QString &indent(QString &s);
- public slots:
+    void selectLine(int position = -1);
+    void selectBlock(int pos = -1, int anc = -1);
+public slots:
     void updateSidebar();
     void mark(const QString &str, Qt::CaseSensitivity sens = Qt::CaseInsensitive);
     void setBracketsMatchingEnabled(bool enable);
