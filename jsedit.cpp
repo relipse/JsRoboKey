@@ -933,7 +933,6 @@ void JSEdit::keyPressEvent(QKeyEvent *e)
                     return; //suppress tab
                 }
             }else{ // T A B   I N D E N T   B L O C K
-                selectBlock();
                 //user selected text and pressed tab
                 //there is good chances he wants to indent that text
                 //so lets shift it right x spaces
@@ -950,7 +949,6 @@ void JSEdit::keyPressEvent(QKeyEvent *e)
                 }
                 cursor.setPosition(endPos, QTextCursor::KeepAnchor);
                 setTextCursor(cursor);
-                selectBlock();
                 return; //suppress tab
             }
         }
@@ -971,7 +969,6 @@ void JSEdit::keyPressEvent(QKeyEvent *e)
                     //do not suppress tab
                  }
             }else{ //user selected text
-                selectBlock();
                 QTextCursor cursor = textCursor();
                 selText = cursor.selection().toPlainText();
                 unindent(selText);
@@ -988,7 +985,6 @@ void JSEdit::keyPressEvent(QKeyEvent *e)
                 cursor.setPosition(startPos);
                 cursor.setPosition(endPos, QTextCursor::KeepAnchor);
                 setTextCursor(cursor);
-                selectBlock();
                 return; //suppress actual tab key
             }
         }//end if Shift+Tab
