@@ -48,11 +48,19 @@ public:
     void setVisible(bool visible);
     void createTrayIcon();
     void createActions();
+    void loadMainScript();
+    bool mainScriptLoaded() const;
+
+    const QStringList &loadedModuleFileStack() const;
+public slots:
+    void createAndEditMainScriptFile();
 private slots:
     void on_btnInstaRun_clicked();
     void on_btnUnloadAll_clicked();
     void on_trayMessageClicked();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
+
+    void on_btnEditMainScript_clicked();
 
 protected:
     virtual void closeEvent(QCloseEvent *event);
@@ -68,7 +76,7 @@ private:
     QString m_lastRunFileOrModule;
     JsRoboKey* m_pjsrobokey;
 
-
+    QAction* actEditMainScript;
     QAction *minimizeAction;
     QAction *maximizeAction;
     QAction *restoreAction;
@@ -81,10 +89,10 @@ private:
     QString trayAction;
     QString trayParam1;
     QJSValue trayJsCallback;
+
+    QString m_defaultEditor;
+    bool m_mainScriptLoaded;
+
+    QStringList m_loadedModuleFileStack;
 };
-
-
-
-
-
 #endif // DLGJSROBOKEY_H

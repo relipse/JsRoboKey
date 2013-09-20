@@ -46,11 +46,13 @@ public:
 
 
 
+
 signals:
     
 public slots:
         const QString clipboard();
 
+        bool isMainScriptLoaded();
         bool fileExists(const QString& file);
         bool require(const QString& file);
         bool include(const QString& file);
@@ -63,9 +65,11 @@ public slots:
         void openFile(const QString& file);
         void open(const QString& url);
 
-        bool run(const QString& file, const QString &a1="", const QString &a2="", const QString &a3="", const QString &a4="", const QString &a5="", const QString &a6="");
-        QString runWait(const QString& file, const QString& a1="");
-        QString getIncludedFiles();
+        bool run(const QString& file, const QStringList& args);
+        bool runSpawn(const QString& file, const QStringList &args);
+        QString runWait(const QString& file, const QStringList &args);
+        QStringList getIncludedFiles();
+        QStringList getLoadedModuleFileStack();
 
         void alert(const QString &text, const QString &title = "");
         int setTimeout(const QJSValue& callback, int ms);

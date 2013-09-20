@@ -30,6 +30,11 @@ const QString JsRoboKey::clipboard()
     return originalText;
 }
 
+bool JsRoboKey::isMainScriptLoaded()
+{
+    return app()->mainScriptLoaded();
+}
+
 
 void JsRoboKey::sleep(int ms)
 {
@@ -196,36 +201,22 @@ void JsRoboKey::open(const QString &url)
     QDesktopServices::openUrl(QUrl(url));
 }
 
-bool JsRoboKey::run(const QString &file, const QString& a1, const QString& a2, const QString& a3, const QString& a4, const QString& a5, const QString& a6)
+bool JsRoboKey::run(const QString &file, const QStringList &args)
 {
-    QProcess *process = new QProcess(this);
-    QStringList args;
-    if (!a1.isEmpty()){
-        args << a1;
-    }
-    if (!a2.isEmpty()){
-        args << a2;
-    }
-    if (!a3.isEmpty()){
-        args << a3;
-    }
-    if (!a4.isEmpty()){
-        args << a4;
-    }
-    if (!a5.isEmpty()){
-        args << a5;
-    }
-    if (!a6.isEmpty()){
-        args << a6;
-    }
-    process->start(file, args);
+    return runSpawn(file, args);
 }
 
-QString JsRoboKey::runWait(const QString &file, const QString &a1)
+bool JsRoboKey::runSpawn(const QString &file, const QStringList &args)
+{
+    QProcess p(this);
+    p.startDetached(file, args);
+}
+
+QString JsRoboKey::runWait(const QString &file, const QStringList &args)
 {
     QProcess process;
     process.setProcessChannelMode(QProcess::MergedChannels);
-    process.start(file, QIODevice::ReadWrite);
+    process.start(file, args, QIODevice::ReadWrite);
 
     // Wait for it to start
     if(!process.waitForStarted())
@@ -242,18 +233,14 @@ QString JsRoboKey::runWait(const QString &file, const QString &a1)
 }
 
 
+QStringList JsRoboKey::getLoadedModuleFileStack(){
+    return app()->loadedModuleFileStack();
+}
 
 
-QString JsRoboKey::getIncludedFiles()
+QStringList JsRoboKey::getIncludedFiles()
 {
-    //they are displayed in the order they were included
-    //with the exception if it was included twice the 2nd one does not appear
-    QString s = "";
-    for (int i = 0; i < m_included_files.length();++i){
-        if (s != ""){ s += ", "; }
-        s += m_included_files[i];
-    }
-    return s;
+    return m_included_files;
 }
 
 void JsRoboKey::alert(const QString &text, const QString& title)
