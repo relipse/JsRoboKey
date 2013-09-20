@@ -123,6 +123,12 @@ bool JsRoboKey::closeWindow(int hwnd)
     return false;
 }
 
+bool JsRoboKey::setTrayIcon(const QString &file)
+{
+    app()->setIcon(QIcon(file));
+    return true;
+}
+
 bool JsRoboKey::trayMsg(const QString &title, const QString &body)
 {
     app()->showTrayMessage(title, body);

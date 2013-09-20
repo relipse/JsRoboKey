@@ -95,6 +95,9 @@ public slots:
         QString getWindowText(int hwnd);
         bool closeWindow(int hwnd);
 
+
+
+        bool setTrayIcon(const QString& file);
         bool trayMsg(const QString &title, const QString &body);
         bool trayMsg(const QString &title, const QString &body, const QJSValue &callback,
                              int iicon = 0, int ms_duration = 3500);

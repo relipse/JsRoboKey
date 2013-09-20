@@ -52,6 +52,7 @@ public:
     bool mainScriptLoaded() const;
 
     const QStringList &loadedModuleFileStack() const;
+    void setIcon(QIcon icon);
 public slots:
     void createAndEditMainScriptFile();
 private slots:

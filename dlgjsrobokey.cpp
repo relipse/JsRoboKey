@@ -253,11 +253,16 @@ void DlgJsRoboKey::iconActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
+void DlgJsRoboKey::setIcon(QIcon icon)
+{
+    trayIcon->setIcon(icon);
+    setWindowIcon(icon);
+}
+
 void DlgJsRoboKey::setIcon(int index)
 {
     QIcon icon = QIcon(tr(":/jsrobokeyicon%1.png").arg(index));
-    trayIcon->setIcon(icon);
-    setWindowIcon(icon);
+    setIcon(icon);
 }
 
 void DlgJsRoboKey::showTrayMessage(const QString &title, const QString &body)
