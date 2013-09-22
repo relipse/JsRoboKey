@@ -8,7 +8,7 @@ JsRoboKey is the main object name, but also rk or jsrk is fine for short.
 There are a few functions that have been globalized such as alert(), require(), and include() which do not need to be prefixed with "rk."
 
 * **string rk.clipboard()** -- get the clipboard text
-* **bool isMainScriptLoaded()** -- check to see whether the main script is loaded (homePath/jsrobokey_main.js ie. could be c:\users\BobSmith\jsrobokey_main.js)
+* **bool rk.isMainScriptLoaded()** -- check to see whether the main script is loaded (homePath/jsrobokey_main.js ie. could be c:\users\BobSmith\jsrobokey_main.js)
 * **bool rk.fileExists(string file)** -- check if a file exists
 * **rk.require(string filename)** -- require/include once a certain file (won't include unless already included)
 * **rk.include(string filename)** -- include/evaluate a js file
