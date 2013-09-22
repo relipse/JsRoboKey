@@ -3,6 +3,8 @@ Functions and Methods
 A variety of functions and methods exist.
 The easiest way to see what is supported in your current version is to run rk.getMethods() or rk.help() in the console sandbox. (rk.getMethods() will list a couple more listed you don't want to call but got stuck in there anyway)
 
+**To see what officially exsits and how each function works, just look at the source code of this file: https://github.com/relipse/JsRoboKey/blob/master/jsrobokey.cpp **
+
 But I will try to post what is current (0.0.0) here as well.
 JsRoboKey is the main object name, but also rk or jsrk is fine for short.
 There are a few functions that have been globalized such as alert(), require(), and include() which do not need to be prefixed with "rk."
