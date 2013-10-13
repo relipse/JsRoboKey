@@ -63,6 +63,8 @@ private slots:
 
     void on_btnEditMainScript_clicked();
 
+    void on_btnHelp_clicked();
+
 protected:
     virtual void closeEvent(QCloseEvent *event);
 

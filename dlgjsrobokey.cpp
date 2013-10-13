@@ -371,3 +371,8 @@ void DlgJsRoboKey::on_btnEditMainScript_clicked()
     createAndEditMainScriptFile();
 }
 
+
+void DlgJsRoboKey::on_btnHelp_clicked()
+{
+    QDesktopServices::openUrl(QString("https://github.com/relipse/JsRoboKey/tree/master/docs"));
+}
