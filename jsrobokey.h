@@ -50,24 +50,28 @@ public:
 signals:
     
 public slots:
-        const QString clipboard();
+
 
         bool isMainScriptLoaded();
         bool fileExists(const QString& file);
         bool require(const QString& file);
         bool include(const QString& file);
 
+        int filePutContents(const QString& file, const QString& data = "");
+
         bool addGlobalHotkey(const QString& hotkey, const QJSValue& callback);
         bool onClipboardChange(const QJSValue& callback);
+        const QString clipboard();
+        void clipboard(QString cb);
 
         bool download(const QString& url, const QJSValue &callback_complete);
         void openUrl(const QString& url);
         void openFile(const QString& file);
         void open(const QString& url);
 
-        bool run(const QString& file, const QStringList& args);
-        bool runSpawn(const QString& file, const QStringList &args);
-        QString runWait(const QString& file, const QStringList &args);
+        bool run(const QString& file, const QStringList& args = QStringList());
+        bool runSpawn(const QString& file, const QStringList &args = QStringList());
+        QString runWait(const QString& file, const QStringList &args = QStringList());
         QStringList getIncludedFiles();
         QStringList getLoadedModuleFileStack();
 
@@ -98,8 +102,8 @@ public slots:
 
 
         bool setTrayIcon(const QString& file);
-        bool trayMsg(const QString &title, const QString &body);
-        bool trayMsg(const QString &title, const QString &body, const QJSValue &callback,
+        bool showTrayMessage(const QString &title, const QString &body);
+        bool showTrayMessage(const QString &title, const QString &body, const QJSValue &callback,
                              int iicon = 0, int ms_duration = 3500);
 
 

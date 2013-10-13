@@ -11,6 +11,8 @@
 #include <QFile>
 #include <QProcess>
 #include <QMessageBox>
+#include <QTextStream>
+
 
 
 JsRoboKey::JsRoboKey(QObject *parent) :
@@ -28,6 +30,12 @@ const QString JsRoboKey::clipboard()
     QClipboard *clipboard = QApplication::clipboard();
     QString originalText = clipboard->text();
     return originalText;
+}
+
+void JsRoboKey::clipboard(QString cb)
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(cb);
 }
 
 bool JsRoboKey::isMainScriptLoaded()
@@ -129,13 +137,13 @@ bool JsRoboKey::setTrayIcon(const QString &file)
     return true;
 }
 
-bool JsRoboKey::trayMsg(const QString &title, const QString &body)
+bool JsRoboKey::showTrayMessage(const QString &title, const QString &body)
 {
     app()->showTrayMessage(title, body);
     return true;
 }
 
-bool JsRoboKey::trayMsg(const QString &title, const QString &body, const QJSValue& callback,
+bool JsRoboKey::showTrayMessage(const QString &title, const QString &body, const QJSValue& callback,
                                 int iicon, int ms_duration)
 {
     app()->showTrayMessage(title, body, callback, iicon, ms_duration);
@@ -165,6 +173,16 @@ bool JsRoboKey::include(const QString &file)
         m_included_files.push_back(file);
     }
     return app()->loadJSFile(file);
+}
+
+int JsRoboKey::filePutContents(const QString &file, const QString &data)
+{
+    QFile qfile(file);
+    qfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&qfile);
+    out << data;
+    qfile.close();
+    return 0;
 }
 
 bool JsRoboKey::addGlobalHotkey(const QString &hotkey, const QJSValue &callback)
