@@ -119,6 +119,8 @@ Everything here is GPL 3 to protect it from becoming proprietary.
 
 Tributes
 --------
+Thanks to Jesus Christ for dying for our sins, and rising from the dead. He has done more for me than all men put combined and I owe my life to Him.
+
 These fellows are inspiration
 AutoHotkey - http://www.autohotkey.com/ and https://github.com/Lexikos/AutoHotkey_L
 Qt - http://qt-project.org
