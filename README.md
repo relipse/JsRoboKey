@@ -119,6 +119,7 @@ Everything here is GPL 3 to protect it from becoming proprietary.
 
 Tributes
 --------
+Try the Bolt Quiz https://boltquiz.org 
 Thanks to Jesus Christ for dying for our sins, and rising from the dead. He has done more for me than all men put combined and I owe my life to Him.
 
 These fellows are inspiration
