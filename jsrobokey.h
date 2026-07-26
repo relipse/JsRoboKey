@@ -4,7 +4,9 @@
 #include <QObject>
 
 #include <QJSEngine>
+#ifdef Q_OS_WIN
 #include <QxtWidgets/QxtGlobalShortcut>
+#endif
 #include <QtQml/QJsEngine>
 #include <QNetworkAccessManager>
 #include <QDebug>
@@ -81,7 +83,7 @@ public slots:
         void clearTimeout(int timeoutId);
 
         bool sendKeys(const QString& keys);
-        void sendVKey(WORD vk);
+        void sendVKey(quint16 vk);
 
         int build();
         QString version(){ return "7777777777"; }

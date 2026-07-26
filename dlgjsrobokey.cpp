@@ -107,9 +107,9 @@ DlgJsRoboKey::DlgJsRoboKey(QWidget *parent) :
     }
 
     //set the default editor for editing main file
-#ifdef Q_OS_WIN32
+#if defined(Q_OS_WIN32)
     m_defaultEditor = "notepad";
-#elif Q_OS_MAC
+#elif defined(Q_OS_MAC)
     m_defaultEditor = "TextEdit";
 #else
     m_defaultEditor = "gedit";

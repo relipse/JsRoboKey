@@ -9,13 +9,15 @@ QT       += qml
 win32 {
    LIBS += -LC:/Qt/libqxt-Qt5/lib/ -lqxtcore
    LIBS += -LC:/Qt/libqxt-Qt5/lib/ -lqxtwidgets
+
+   INCLUDEPATH += C:/Qt/libqxt-Qt5/src/core
+   INCLUDEPATH += C:/Qt/libqxt-Qt5/include
+   DEPENDPATH += C:/Qt/libqxt-Qt5/src/core
 }
 
-
-INCLUDEPATH += C:/Qt/libqxt-Qt5/src/core
-INCLUDEPATH += C:/Qt/libqxt-Qt5/include
-DEPENDPATH += C:/Qt/libqxt-Qt5/src/core
-
+macx {
+   ICON = jsrobokeyicon1.icns
+}
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
