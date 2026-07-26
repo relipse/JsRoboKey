@@ -100,6 +100,8 @@ int JsRoboKey::getForegroundWindow()
     //TODO: make this cross platform
     #ifdef WIN32
     return (int)GetForegroundWindow();
+    #else
+    return 0;
     #endif
 }
 
@@ -316,7 +318,9 @@ void JsRoboKey::clearTimeout(int timeoutId){
 }
 
 
-void JsRoboKey::sendVKey(WORD vk){
+void JsRoboKey::sendVKey(quint16 vk){
+    //TODO: make this cross platform
+#ifdef WIN32
     INPUT ip;
 
     // Set up a generic keyboard event.
@@ -333,6 +337,9 @@ void JsRoboKey::sendVKey(WORD vk){
     // Release the key
     ip.ki.dwFlags = KEYEVENTF_KEYUP; // KEYEVENTF_KEYUP for key release
     SendInput(1, &ip, sizeof(INPUT));
+#else
+    Q_UNUSED(vk);
+#endif
 }
 
 bool JsRoboKey::sendKeys(const QString &keys)

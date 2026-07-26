@@ -2,7 +2,9 @@
 #define DLGJSROBOKEY_H
 
 #include <QDialog>
+#ifdef Q_OS_WIN
 #include <QxtWidgets/QxtGlobalShortcut>
+#endif
 #include <QtQml/QJsEngine>
 #include <QNetworkAccessManager>
 #include <QDebug>
